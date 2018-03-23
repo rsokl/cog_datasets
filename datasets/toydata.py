@@ -98,7 +98,7 @@ class ToyData(object):
         ax.set_xlim([-1, 1])
         ax.set_ylim([-1, 1])
         ax.set_title("Spiral Dataset (colored by class)")
-        ax.set_axis_bgcolor('lightgrey')
+
         plt.show()
         return fig, ax
 
