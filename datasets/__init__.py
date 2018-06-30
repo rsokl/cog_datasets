@@ -53,7 +53,7 @@ def set_path(new_path, mkdir=False):
     """
     new_path = Path(new_path)
     if mkdir:
-        new_path.mkdir(new_path, exist_ok=True)
+        new_path.mkdir(exist_ok=True)
     with _config_file.open(mode="w") as f:
         f.write("# The python pacakge `datasets` will write data to the following directory:\n")
         f.write(str(new_path.absolute()))
@@ -101,11 +101,11 @@ def download_cifar10():
 
 
 def load_cifar10(fname='cifar-10-python.npz'):
-    """ The CIFAR-10 dataset consists of 60000x3x32x32 color images in 10 
+    """ The CIFAR-10 dataset consists of 60000x3x32x32 uint-8 color images in 10
         classes, with 6000 images per class. There are 50000 training images 
         and 10000 test images.
 
-        The labels are formatted using one-hot encoding.
+        The labels are integers in [0, 9]
 
         https://www.cs.toronto.edu/~kriz/cifar.html
 
@@ -184,10 +184,10 @@ def download_fashion_mnist():
 def load_fashion_mnist(fname="fashion_mnist.npz"):
     """ Loads the fashion-mnist dataset (including train & test, along with their labels).
 
-        The data set is loaded as Nx1x28x28 numpy arrays. N is the size of the
-        data set - N = 60,000 for the training set, and N = 10,000 for the test set.
+        The data set is loaded as Nx1x28x28 uint8 numpy arrays. N is the size of the
+        data set - N=60,000 for the training set, and N=10,000 for the test set.
 
-        The labels are formatted using one-hot encoding.
+        The labels are integers in [0, 9]
 
         Additional information regarding the fashion-mnist data set can be found here:
             - https://github.com/zalandoresearch/fashion-mnist
@@ -268,7 +268,10 @@ def load_mnist(fname="mnist.npz"):
         10,000 examples. It is a subset of a larger set available from NIST. The digits have been
         size-normalized and centered in a fixed-size image.
 
-        The labels are formatted using one-hot encoding.
+        The data set is loaded as Nx1x28x28 uint8 numpy arrays. N is the size of the
+        data set - N=60,000 for the training set, and N=10,000 for the test set.
+
+        The labels are integers in [0, 9]
 
         http://yann.lecun.com/exdb/mnist/
 
