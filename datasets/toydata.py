@@ -75,7 +75,7 @@ class ToyData(object):
             -------
             Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]
                 Training and validation data/labels."""
-        return self.x_train, self.y_train, self.x_test, self.y_test
+        return self.x_train, np.argmax(self.y_train, axis=-1), self.x_test, np.argmax(self.y_test, axis=-1)
 
     def _check_plotability(self):
         if self._coords.ndim != 2:
