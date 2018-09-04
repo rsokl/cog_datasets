@@ -95,7 +95,11 @@ def _download_mnist(path, server_url, tmp_file, check_sums=None):
                     handle.write(response.read())
 
                 if check_sums is not None and isinstance(check_sums[urls[img_key]], str):
-                    assert _md5_check(tmp_file) == check_sums[urls[img_key]], "md5 checksum did not match!.. deleting file"
+                    # check md5
+                    expected = check_sums[urls[img_key]]
+                    found = _md5_check(tmp_file)
+                    msg = "md5 checksum did not match!.. deleting file:\nexpected: {}\nfound: {}".format(expected, found)
+                    assert expected == found, msg
                 elif check_sums is not None and isinstance(check_sums[urls[img_key]], int):
                     os.path.getsize(tmp_file) == check_sums[urls[img_key]], "downloaded filesize is bad!.. deleting file"
 
@@ -113,7 +117,10 @@ def _download_mnist(path, server_url, tmp_file, check_sums=None):
 
                 if check_sums is not None and isinstance(check_sums[urls[img_key]], str):
                     # check md5
-                    assert _md5_check(tmp_file) == check_sums[urls[img_key]], "md5 checksum did not match!.. deleting file"
+                    expected = check_sums[urls[lbl_key]]
+                    found = _md5_check(tmp_file)
+                    msg = "md5 checksum did not match!.. deleting file:\nexpected: {}\nfound: {}".format(expected, found)
+                    assert expected == found, msg
                 elif check_sums is not None and isinstance(check_sums[urls[img_key]], int):
                     # check filesize
                     os.path.getsize(tmp_file) == check_sums[urls[img_key]], "downloaded filesize is bad!.. deleting file"
