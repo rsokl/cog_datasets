@@ -103,10 +103,10 @@ def download_cifar10():
 
 
 def download_cifar100():
-    """ Download the cifar-10 dataset and save it as a .npz archive.
+    """ Download the cifar-100 dataset and save it as a .npz archive.
         md5 check-sum verification is performed.
 
-        path = <path_to_datasets>/cifar-10-python.npz """
+        path = <path_to_datasets>/cifar-100-python.npz """
     from datasets.download_utils import _download_cifar100
     import shutil
     tmp_dir = get_path() / "_tmp_dir_"
@@ -124,7 +124,7 @@ def download_cifar100():
 
 def load_cifar10(fname='cifar-10-python.npz'):
     """ The CIFAR-10 dataset consists of 60000x3x32x32 uint-8 color images in 10
-        classes, with 6000 images per class. There are 50000 training images 
+        classes, with 6000 images per class. There are 50000 training images
         and 10000 test images.
 
         The labels are integers in [0, 9]
@@ -203,7 +203,7 @@ def load_cifar100(fname='cifar-100-python.npz'):
     path = get_path()
     if not (path / fname).exists():
         msg = """ Data not found! Please download the data (cifar-100-python.npz) using 
-                 `datasets.download_cifar10()`"""
+                 `datasets.download_cifar100()`"""
         raise FileNotFoundError(msg)
 
     with np.load(str(path / fname)) as data:
