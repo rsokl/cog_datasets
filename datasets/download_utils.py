@@ -12,6 +12,69 @@ def _md5_check(fname):
     return hash_md5.hexdigest()
 
 
+def _download_cifar100(path, tmp_dir):
+    server_url = "https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz"
+    md5_checksum = "eb9058c3a382ffc7106e4002c42a8d85"
+    tmp_file = "__tmp_cifar100.bin"
+
+    import tarfile
+    import urllib.request
+    import os
+
+    def unpickle(file):
+        import pickle
+        with open(file, 'rb') as fo:
+            return pickle.load(fo, encoding='bytes')
+
+    path = Path(path) / 'cifar-100-python.npz'
+
+    if path.is_file():
+        print("File already exists:\n\t{}".format(path))
+        return None
+
+    train = np.empty((50000, 3072), dtype=np.uint8)
+
+    print("Downloading from: {}".format(server_url))
+
+    try:
+        with urllib.request.urlopen(server_url) as response:
+            with open(tmp_file, 'wb') as handle:
+                handle.write(response.read())
+
+            assert _md5_check(tmp_file) == md5_checksum, "md5 checksum did not match!.. deleting file"
+
+            with tarfile.open(tmp_file, 'r:gz') as f:
+                f.extractall(tmp_dir)
+    finally:
+        if os.path.isfile(tmp_file):
+            os.remove(tmp_file)
+
+    d = unpickle(tmp_dir / "cifar-100-python/train")
+    train = d[b'data']
+    train_labels = d[b'fine_labels']
+
+    train = train.reshape(-1, 3, 32, 32)
+    train_labels = np.asarray(train_labels)
+
+    print("Writing train data:")
+    print("Images: ", train.shape, train.dtype)
+    print("Labels: ", train_labels.shape, train_labels.dtype)
+
+    d = unpickle(tmp_dir / "cifar-100-python/test")
+    test = np.asarray(d[b'data']).reshape(-1, 3, 32, 32)
+    test_labels = np.array(d[b'fine_labels'])
+
+    print("Writing test data:")
+    print("Images: ", test.shape, test.dtype)
+    print("Labels: ", test_labels.shape, test_labels.dtype)
+
+    print("Saving to: {}".format(path))
+    with path.open(mode="wb") as f:
+        np.savez_compressed(f, x_train=train, y_train=train_labels,
+                            x_test=test, y_test=test_labels)
+    return
+
+
 def _download_cifar10(path, tmp_dir):
     server_url = "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
     md5_checksum = "c58f30108f718f92721af3b95e74349a"
