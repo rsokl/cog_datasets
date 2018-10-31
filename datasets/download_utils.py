@@ -12,6 +12,73 @@ def _md5_check(fname):
     return hash_md5.hexdigest()
 
 
+def _download_svhn(path, tmp_dir):
+    train_url = "http://ufldl.stanford.edu/housenumbers/train_32x32.mat"
+    test_url = "http://ufldl.stanford.edu/housenumbers/test_32x32.mat"
+    train_md5 = "e26dedcc434d2e4c54c9b2d4a06d8373"
+    test_md5 = "eb5a983be6a315427106f1b164d9cef3"
+    tmp_file_train = "__tmp_svhn_train.bin"
+    tmp_file_test = "__tmp_svhn_test.bin"
+
+    import urllib.request
+    import os
+
+    path = Path(path) / 'svhn-python.npz'
+    if path.is_file():
+        print("File already exists:\n\t{}".format(path))
+        return None
+
+    def extract(file, end_offset):
+        import zlib
+
+        with open(file, 'rb') as f:
+            f = f.read()
+            endianness = 'big' if f[126:128] == b'MI' else 'little'
+            num_bytes = int.from_bytes(f[132:136], endianness)
+            uncompressed = zlib.decompress(f[136:num_bytes+136])
+            data = np.frombuffer(uncompressed[64:], dtype=np.uint8).reshape(-1, 3, 32, 32).transpose(0, 1, 3, 2)
+
+            uncompressed = zlib.decompress(f[num_bytes+136+8:])
+            labels = np.frombuffer(uncompressed[56:end_offset], dtype=np.uint8)
+        return data, labels
+
+    print("Downloading from: {}".format(train_url))
+    try:
+        with urllib.request.urlopen(train_url) as response:
+            with open(tmp_file_train, 'wb') as handle:
+                handle.write(response.read())
+
+            assert _md5_check(tmp_file_train) == train_md5, "md5 checksum did not match!.. deleting file"
+
+            train_data, train_labels = extract(tmp_file_train, -7)
+            train_labels = train_labels.copy()
+            train_labels[train_labels == 10] = 0
+    finally:
+        if os.path.isfile(tmp_file_train):
+            os.remove(tmp_file_train)
+
+    print("Downloading from: {}".format(test_url))
+    try:
+        with urllib.request.urlopen(test_url) as response:
+            with open(tmp_file_test, 'wb') as handle:
+                handle.write(response.read())
+
+            assert _md5_check(tmp_file_test) == test_md5, "md5 checksum did not match!.. deleting file"
+
+            test_data, test_labels = extract(tmp_file_test, None)
+            test_labels = test_labels.copy()
+            test_labels[test_labels == 10] = 0
+    finally:
+        if os.path.isfile(tmp_file_test):
+            os.remove(tmp_file_test)
+
+    print("Saving to: {}".format(path))
+    with path.open(mode="wb") as f:
+        np.savez_compressed(f, x_train=train_data, y_train=train_labels,
+                            x_test=test_data, y_test=test_labels)
+    return
+
+
 def _download_cifar100(path, tmp_dir):
     server_url = "https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz"
     md5_checksum = "eb9058c3a382ffc7106e4002c42a8d85"
