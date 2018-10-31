@@ -11,9 +11,11 @@ import numpy as np
 from .toydata import ToyData
 
 __all__ = ["load_cifar10",
+           "load_cifar100",
            "load_mnist",
            "load_fashion_mnist",
            "download_cifar10",
+           "download_cifar100",
            "download_fashion_mnist",
            "download_mnist",
            "ToyData"]
@@ -100,9 +102,29 @@ def download_cifar10():
             shutil.rmtree(tmp_dir)
 
 
+def download_cifar100():
+    """ Download the cifar-100 dataset and save it as a .npz archive.
+        md5 check-sum verification is performed.
+
+        path = <path_to_datasets>/cifar-100-python.npz """
+    from datasets.download_utils import _download_cifar100
+    import shutil
+    tmp_dir = get_path() / "_tmp_dir_"
+    if tmp_dir.exists():
+        print("Directory: {} already exists - an intermediate directory needs to be constructed here".format(tmp_dir))
+        print("move/delete that directory and try again.")
+        return None
+
+    try:
+        _download_cifar100(get_path(), tmp_dir)
+    finally:
+        if tmp_dir.exists():
+            shutil.rmtree(tmp_dir)
+
+
 def load_cifar10(fname='cifar-10-python.npz'):
     """ The CIFAR-10 dataset consists of 60000x3x32x32 uint-8 color images in 10
-        classes, with 6000 images per class. There are 50000 training images 
+        classes, with 6000 images per class. There are 50000 training images
         and 10000 test images.
 
         The labels are integers in [0, 9]
@@ -111,7 +133,7 @@ def load_cifar10(fname='cifar-10-python.npz'):
 
         Parameters
         ----------
-        fname : str, optional (default="mnist.npz")
+        fname : str, optional (default="cifar-10-python.npz")
             The filename of the .npz archive storing the cifar-10 data
 
         Returns
@@ -149,6 +171,147 @@ load_cifar10.labels = ("airplane",
                        "horse",
                        "ship",
                        "truck")
+
+
+def load_cifar100(fname='cifar-100-python.npz'):
+    """ The CIFAR-100 dataset consists of 60000x3x32x32 uint-8 color images in 100
+        classes, with 600 images per class. There are 50000 training images
+        and 10000 test images.
+
+        The labels are integers in [0, 99]
+
+        https://www.cs.toronto.edu/~kriz/cifar.html
+
+        Parameters
+        ----------
+        fname : str, optional (default="cifar-100-python.npz")
+            The filename of the .npz archive storing the cifar-100 data.
+
+        Returns
+        -------
+        Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]
+            training-data, training-labels, test-data, test-labels
+
+        Notes
+        -----
+        A tuple of the categories corresponding to the data's integer labels are bound as an
+        attribute of this function:
+
+            `dataset.load_cifar100.labels`
+        """
+
+    path = get_path()
+    if not (path / fname).exists():
+        msg = """ Data not found! Please download the data (cifar-100-python.npz) using 
+                 `datasets.download_cifar100()`"""
+        raise FileNotFoundError(msg)
+
+    with np.load(str(path / fname)) as data:
+        xtr, ytr, xte, yte = tuple(data[key] for key in ['x_train', 'y_train', 'x_test', 'y_test'])
+    print("cifar-100 loaded")
+    return xtr, ytr, xte, yte
+
+
+load_cifar100.labels = ('apples',
+                        'aquarium fish',
+                        'baby',
+                        'bear',
+                        'beaver',
+                        'bed',
+                        'bee',
+                        'beetle',
+                        'bicycle',
+                        'bottles',
+                        'bowls',
+                        'boy',
+                        'bridge',
+                        'bus',
+                        'butterfly',
+                        'camel',
+                        'cans',
+                        'castle',
+                        'caterpillar',
+                        'cattle',
+                        'chair',
+                        'chimpanzee',
+                        'clock',
+                        'cloud',
+                        'cockroach',
+                        'computer keyboard',
+                        'couch',
+                        'crab',
+                        'crocodile',
+                        'cups',
+                        'dinosaur',
+                        'dolphin',
+                        'elephant',
+                        'flatfish',
+                        'forest',
+                        'fox',
+                        'girl',
+                        'hamster',
+                        'house',
+                        'kangaroo',
+                        'lamp',
+                        'lawn-mower',
+                        'leopard',
+                        'lion',
+                        'lizard',
+                        'lobster',
+                        'man',
+                        'maple',
+                        'motorcycle',
+                        'mountain',
+                        'mouse',
+                        'mushrooms',
+                        'oak',
+                        'oranges',
+                        'orchids',
+                        'otter',
+                        'palm',
+                        'pears',
+                        'pickup truck',
+                        'pine',
+                        'plain',
+                        'plates',
+                        'poppies',
+                        'porcupine',
+                        'possum',
+                        'rabbit',
+                        'raccoon',
+                        'ray',
+                        'road',
+                        'rocket',
+                        'roses',
+                        'sea',
+                        'seal',
+                        'shark',
+                        'shrew',
+                        'skunk',
+                        'skyscraper',
+                        'snail',
+                        'snake',
+                        'spider',
+                        'squirrel',
+                        'streetcar',
+                        'sunflowers',
+                        'sweet peppers',
+                        'table',
+                        'tank',
+                        'telephone',
+                        'television',
+                        'tiger',
+                        'tractor',
+                        'train',
+                        'trout',
+                        'tulips',
+                        'turtle',
+                        'wardrobe',
+                        'whale',
+                        'willow',
+                        'wolf',
+                        'woman',
+                        'worm')
 
 
 def download_fashion_mnist():
