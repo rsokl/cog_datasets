@@ -76,7 +76,7 @@ def restore_default_path(are_you_sure):
     global path
     import os
     if are_you_sure is not True:
-        print("You must expliticly specify `restore_default_path(True)` to reset the path.")
+        print("You must explicitly specify `restore_default_path(True)` to reset the path.")
         return
 
     if _config_file.is_file():
@@ -142,6 +142,62 @@ def download_cifar100():
     finally:
         if tmp_dir.exists():
             shutil.rmtree(tmp_dir)
+
+
+def download_fashion_mnist():
+    """ Function for downloading fashion-mnist and saves fashion-mnist as a
+        numpy compressed-archive. md5 check-sum verficiation is performed.
+
+        Parameters
+        ----------
+        path : Optional[pathlib.Path, str]
+            Path to containing .npz file. If `None`, the path to the DataSets module is used."""
+    from datasets.download_utils import _md5_check, _download_mnist
+
+    path = get_path() / "fashion_mnist.npz"
+    tmp_file = get_path() / "__mnist.bin"
+
+    if path.is_file():
+        print("File already exists:\n\t{}".format(path))
+        return None
+
+    if path.is_dir():
+        print("`path` specifies a directory. It should specify the file-destination, including the file-name.")
+        return None
+
+    server_url = "http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/"
+
+    check_sums = {"train-images-idx3-ubyte.gz": "8d4fb7e6c68d591d4c3dfef9ec88bf0d",
+                  "train-labels-idx1-ubyte.gz": "25c81989df183df01b3e8a0aad5dffbe",
+                  "t10k-images-idx3-ubyte.gz": "bef4ecab320f06d8554ea6380940ec79",
+                  "t10k-labels-idx1-ubyte.gz": "bb300cfdad3c16e7a12a480ee83cd310"}
+    _download_mnist(path, server_url=server_url, tmp_file=tmp_file, check_sums=check_sums)
+
+
+def download_mnist():
+    """ Function for downloading mnist and saves fashion-mnist as a
+        numpy compressed-archive. file-size verificiation is performed."""
+
+    from datasets.download_utils import _md5_check, _download_mnist
+
+    path = get_path() / "mnist.npz"
+    tmp_file = get_path() / "__mnist.bin"
+
+    if path.is_file():
+        print("File already exists:\n\t{}".format(path))
+        return None
+
+    if path.is_dir():
+        print("`path` specifies a directory. It should specify the file-destination, including the file-name.")
+        return None
+
+    server_url = "http://yann.lecun.com/exdb/mnist/"
+
+    check_file_sizes = {"train-images-idx3-ubyte.gz": 9912422,
+                        "train-labels-idx1-ubyte.gz": 28881,
+                        "t10k-images-idx3-ubyte.gz": 28881,
+                        "t10k-labels-idx1-ubyte.gz": 4542}
+    _download_mnist(path, server_url=server_url, tmp_file=tmp_file, check_sums=check_file_sizes)
 
 
 def load_svhn(fname='svhn-python.npz'):
@@ -377,36 +433,6 @@ load_cifar100.labels = ('apples',
                         'worm')
 
 
-def download_fashion_mnist():
-    """ Function for downloading fashion-mnist and saves fashion-mnist as a
-        numpy compressed-archive. md5 check-sum verficiation is performed.
-
-        Parameters
-        ----------
-        path : Optional[pathlib.Path, str]
-            Path to containing .npz file. If `None`, the path to the DataSets module is used."""
-    from datasets.download_utils import _md5_check, _download_mnist
-
-    path = get_path() / "fashion_mnist.npz"
-    tmp_file = get_path() / "__mnist.bin"
-
-    if path.is_file():
-        print("File already exists:\n\t{}".format(path))
-        return None
-
-    if path.is_dir():
-        print("`path` specifies a directory. It should specify the file-destination, including the file-name.")
-        return None
-
-    server_url = "http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/"
-
-    check_sums = {"train-images-idx3-ubyte.gz": "8d4fb7e6c68d591d4c3dfef9ec88bf0d",
-                  "train-labels-idx1-ubyte.gz": "25c81989df183df01b3e8a0aad5dffbe",
-                  "t10k-images-idx3-ubyte.gz": "bef4ecab320f06d8554ea6380940ec79",
-                  "t10k-labels-idx1-ubyte.gz": "bb300cfdad3c16e7a12a480ee83cd310"}
-    _download_mnist(path, server_url=server_url, tmp_file=tmp_file, check_sums=check_sums)
-
-
 def load_fashion_mnist(fname="fashion_mnist.npz"):
     """ Loads the fashion-mnist dataset (including train & test, along with their labels).
 
@@ -463,32 +489,6 @@ load_fashion_mnist.labels = ('T-shirt/top',
                              'Ankle boot')
 
 
-def download_mnist():
-    """ Function for downloading mnist and saves fashion-mnist as a
-        numpy compressed-archive. file-size verificiation is performed."""
-
-    from datasets.download_utils import _md5_check, _download_mnist
-
-    path = get_path() / "mnist.npz"
-    tmp_file = get_path() / "__mnist.bin"
-
-    if path.is_file():
-        print("File already exists:\n\t{}".format(path))
-        return None
-
-    if path.is_dir():
-        print("`path` specifies a directory. It should specify the file-destination, including the file-name.")
-        return None
-
-    server_url = "http://yann.lecun.com/exdb/mnist/"
-
-    check_file_sizes = {"train-images-idx3-ubyte.gz": 9912422,
-                        "train-labels-idx1-ubyte.gz": 28881,
-                        "t10k-images-idx3-ubyte.gz": 28881,
-                        "t10k-labels-idx1-ubyte.gz": 4542}
-    _download_mnist(path, server_url=server_url, tmp_file=tmp_file, check_sums=check_file_sizes)
-
-
 def load_mnist(fname="mnist.npz"):
     """ The MNIST database of handwritten digits, has a training set of 60,000 examples, and a test set of
         10,000 examples. It is a subset of a larger set available from NIST. The digits have been
@@ -520,336 +520,5 @@ def load_mnist(fname="mnist.npz"):
 load_mnist.labels = tuple(str(i) for i in range(10))
 
 
-def load_cifar10(fname='cifar-10-python.npz'):
-    """ The CIFAR-10 dataset consists of 60000x3x32x32 uint-8 color images in 10
-        classes, with 6000 images per class. There are 50000 training images
-        and 10000 test images.
-
-        The labels are integers in [0, 9]
-
-        https://www.cs.toronto.edu/~kriz/cifar.html
-
-        Parameters
-        ----------
-        fname : str, optional (default="cifar-10-python.npz")
-            The filename of the .npz archive storing the cifar-10 data
-
-        Returns
-        -------
-        Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]
-            training-data, training-labels, test-data, test-labels
-
-        Notes
-        -----
-        A tuple of the categories corresponding to the data's integer labels are bound as an
-        attribute of this function:
-
-            `dataset.load_cifar10.labels`
-        """
-
-    path = get_path()
-    if not (path / fname).exists():
-        msg = """ Data not found! Please download the data (cifar-10-python.npz) using 
-                 `datasets.download_cifar10()`"""
-        raise FileNotFoundError(msg)
-
-    with np.load(str(path / fname)) as data:
-        xtr, ytr, xte, yte = tuple(data[key] for key in ['x_train', 'y_train', 'x_test', 'y_test'])
-    print("cifar-10 loaded")
-    return xtr, ytr, xte, yte
 
 
-load_cifar10.labels = ("airplane",
-                       "automobile",
-                       "bird",
-                       "cat",
-                       "deer",
-                       "dog",
-                       "frog",
-                       "horse",
-                       "ship",
-                       "truck")
-
-
-def load_cifar100(fname='cifar-100-python.npz'):
-    """ The CIFAR-100 dataset consists of 60000x3x32x32 uint-8 color images in 100
-        classes, with 600 images per class. There are 50000 training images
-        and 10000 test images.
-
-        The labels are integers in [0, 99]
-
-        https://www.cs.toronto.edu/~kriz/cifar.html
-
-        Parameters
-        ----------
-        fname : str, optional (default="cifar-100-python.npz")
-            The filename of the .npz archive storing the cifar-100 data.
-
-        Returns
-        -------
-        Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]
-            training-data, training-labels, test-data, test-labels
-
-        Notes
-        -----
-        A tuple of the categories corresponding to the data's integer labels are bound as an
-        attribute of this function:
-
-            `dataset.load_cifar100.labels`
-        """
-
-    path = get_path()
-    if not (path / fname).exists():
-        msg = """ Data not found! Please download the data (cifar-100-python.npz) using 
-                 `datasets.download_cifar100()`"""
-        raise FileNotFoundError(msg)
-
-    with np.load(str(path / fname)) as data:
-        xtr, ytr, xte, yte = tuple(data[key] for key in ['x_train', 'y_train', 'x_test', 'y_test'])
-    print("cifar-100 loaded")
-    return xtr, ytr, xte, yte
-
-
-load_cifar100.labels = ('apples',
-                        'aquarium fish',
-                        'baby',
-                        'bear',
-                        'beaver',
-                        'bed',
-                        'bee',
-                        'beetle',
-                        'bicycle',
-                        'bottles',
-                        'bowls',
-                        'boy',
-                        'bridge',
-                        'bus',
-                        'butterfly',
-                        'camel',
-                        'cans',
-                        'castle',
-                        'caterpillar',
-                        'cattle',
-                        'chair',
-                        'chimpanzee',
-                        'clock',
-                        'cloud',
-                        'cockroach',
-                        'computer keyboard',
-                        'couch',
-                        'crab',
-                        'crocodile',
-                        'cups',
-                        'dinosaur',
-                        'dolphin',
-                        'elephant',
-                        'flatfish',
-                        'forest',
-                        'fox',
-                        'girl',
-                        'hamster',
-                        'house',
-                        'kangaroo',
-                        'lamp',
-                        'lawn-mower',
-                        'leopard',
-                        'lion',
-                        'lizard',
-                        'lobster',
-                        'man',
-                        'maple',
-                        'motorcycle',
-                        'mountain',
-                        'mouse',
-                        'mushrooms',
-                        'oak',
-                        'oranges',
-                        'orchids',
-                        'otter',
-                        'palm',
-                        'pears',
-                        'pickup truck',
-                        'pine',
-                        'plain',
-                        'plates',
-                        'poppies',
-                        'porcupine',
-                        'possum',
-                        'rabbit',
-                        'raccoon',
-                        'ray',
-                        'road',
-                        'rocket',
-                        'roses',
-                        'sea',
-                        'seal',
-                        'shark',
-                        'shrew',
-                        'skunk',
-                        'skyscraper',
-                        'snail',
-                        'snake',
-                        'spider',
-                        'squirrel',
-                        'streetcar',
-                        'sunflowers',
-                        'sweet peppers',
-                        'table',
-                        'tank',
-                        'telephone',
-                        'television',
-                        'tiger',
-                        'tractor',
-                        'train',
-                        'trout',
-                        'tulips',
-                        'turtle',
-                        'wardrobe',
-                        'whale',
-                        'willow',
-                        'wolf',
-                        'woman',
-                        'worm')
-
-
-def download_fashion_mnist():
-    """ Function for downloading fashion-mnist and saves fashion-mnist as a
-        numpy compressed-archive. md5 check-sum verficiation is performed.
-
-        Parameters
-        ----------
-        path : Optional[pathlib.Path, str]
-            Path to containing .npz file. If `None`, the path to the DataSets module is used."""
-    from datasets.download_utils import _md5_check, _download_mnist
-
-    path = get_path() / "fashion_mnist.npz"
-    tmp_file = get_path() / "__mnist.bin"
-
-    if path.is_file():
-        print("File already exists:\n\t{}".format(path))
-        return None
-
-    if path.is_dir():
-        print("`path` specifies a directory. It should specify the file-destination, including the file-name.")
-        return None
-
-    server_url = "http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/"
-
-    check_sums = {"train-images-idx3-ubyte.gz": "8d4fb7e6c68d591d4c3dfef9ec88bf0d",
-                  "train-labels-idx1-ubyte.gz": "25c81989df183df01b3e8a0aad5dffbe",
-                  "t10k-images-idx3-ubyte.gz": "bef4ecab320f06d8554ea6380940ec79",
-                  "t10k-labels-idx1-ubyte.gz": "bb300cfdad3c16e7a12a480ee83cd310"}
-    _download_mnist(path, server_url=server_url, tmp_file=tmp_file, check_sums=check_sums)
-
-
-def load_fashion_mnist(fname="fashion_mnist.npz"):
-    """ Loads the fashion-mnist dataset (including train & test, along with their labels).
-
-        The data set is loaded as Nx1x28x28 uint8 numpy arrays. N is the size of the
-        data set - N=60,000 for the training set, and N=10,000 for the test set.
-
-        The labels are integers in [0, 9]
-
-        Additional information regarding the fashion-mnist data set can be found here:
-            - https://github.com/zalandoresearch/fashion-mnist
-
-        Parameters
-        ----------
-        fname : str, optional (default="fashion_mnist.npz")
-            The filename of the .npz file to be loaded
-
-        Returns
-        -------
-        Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]
-            training-data, training-labels, test-data, test-labels
-
-        Notes
-        -----
-        A tuple of the categories corresponding to the data's integer labels are bound as an
-        attribute of this function:
-
-            `dataset.load_fashion_mnist.labels`
-        """
-
-    path = get_path()
-
-    if not (path / fname).exists():
-        import inspect
-        msg = """ Data not found! Please download the data (fashion_mnist.npz) using 
-                 `datasets.download_fashion_mnist()`"""
-        raise FileNotFoundError(inspect.cleandoc(msg))
-
-    with np.load(str(path / fname)) as data:
-        out = [data[key] for key in ['x_train', 'y_train', 'x_test', 'y_test']]
-
-    print("fashion-mnist loaded")
-    return tuple(out)
-
-
-load_fashion_mnist.labels = ('T-shirt/top',
-                             'Trouser',
-                             'Pullover',
-                             'Dress',
-                             'Coat',
-                             'Sandal',
-                             'Shirt',
-                             'Sneaker',
-                             'Bag',
-                             'Ankle boot')
-
-
-def download_mnist():
-    """ Function for downloading mnist and saves fashion-mnist as a
-        numpy compressed-archive. file-size verificiation is performed."""
-
-    from datasets.download_utils import _md5_check, _download_mnist
-
-    path = get_path() / "mnist.npz"
-    tmp_file = get_path() / "__mnist.bin"
-
-    if path.is_file():
-        print("File already exists:\n\t{}".format(path))
-        return None
-
-    if path.is_dir():
-        print("`path` specifies a directory. It should specify the file-destination, including the file-name.")
-        return None
-
-    server_url = "http://yann.lecun.com/exdb/mnist/"
-
-    check_file_sizes = {"train-images-idx3-ubyte.gz": 9912422,
-                        "train-labels-idx1-ubyte.gz": 28881,
-                        "t10k-images-idx3-ubyte.gz": 28881,
-                        "t10k-labels-idx1-ubyte.gz": 4542}
-    _download_mnist(path, server_url=server_url, tmp_file=tmp_file, check_sums=check_file_sizes)
-
-
-def load_mnist(fname="mnist.npz"):
-    """ The MNIST database of handwritten digits, has a training set of 60,000 examples, and a test set of
-        10,000 examples. It is a subset of a larger set available from NIST. The digits have been
-        size-normalized and centered in a fixed-size image.
-
-        The data set is loaded as Nx1x28x28 uint8 numpy arrays. N is the size of the
-        data set - N=60,000 for the training set, and N=10,000 for the test set.
-
-        The labels are integers in [0, 9]
-
-        http://yann.lecun.com/exdb/mnist/
-
-        Parameters
-        ----------
-        fname : str, optional (default="mnist.npz")
-            The filename of the .npz archive storing the mnist data
-
-        Returns
-        -------
-        Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]
-            training-data, training-labels, test-data, test-labels"""
-    path = get_path()
-    with np.load(path / fname) as data:
-        out = tuple(data[str(key)] for key in ['x_train', 'y_train', 'x_test', 'y_test'])
-    print("mnist loaded")
-    return out
-
-
-load_mnist.labels = tuple(str(i) for i in range(10))
