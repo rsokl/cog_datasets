@@ -7,17 +7,17 @@ class ToyData(object):
 
         Each 'class' in this dataset is its own 'tendril' in the spiral."""
 
-    def __init__(self, num_classes=3, points_per_class=120, dimensionality=2, seed_value=None):
+    def __init__(self, num_classes=3, points_per_class=120, num_revolutions=1., seed_value=None):
         """ Parameters
             ----------
             num_classes : int, optional (default=3)
-                Number of tendrils
+                Number of tendrils.
 
             points_per_class : int, optional (default=120)
                 Number of points generated in each tendril.
 
-            dimensionality : int, optional (default=2)
-                Dimensionality of the generated data. 2D is required for plotting.
+            num_revolutions : float, optional (default=1.)
+                The number of full rotations to be completed by each tendril.
 
             seed_value : Optional[int]
                 Provide a seed-value to control the generation of the dataset."""
@@ -25,7 +25,7 @@ class ToyData(object):
             np.random.seed(seed_value)
 
         N = points_per_class  # number of points per class
-        D = dimensionality  # dimensionality
+        D = 2  # dimensionality
         K = num_classes  # number of classes
 
         n_train = round(N // 1.2)
@@ -40,7 +40,8 @@ class ToyData(object):
         for j in range(K):
             ix = range(N * j, N * (j + 1))
             r = np.linspace(0.0, 1, N)  # radius
-            t = np.linspace(j * (K + 1), (j + 1) * (K + 1), N) + np.random.randn(N) * 0.2  # theta
+            t = np.linspace(0, 2 * np.pi * num_revolutions, N) + np.random.randn(N) * 0.2  # theta
+            t += j/K * 2*np.pi  # phase-shift to offset subsequent tendrils
             self._coords[ix] = np.column_stack((r * np.sin(t), r * np.cos(t)))
             self._labels[ix] = j
             y_labels[ix, j] = 1
