@@ -25,8 +25,6 @@ By default, all data sets will be downloaded to ~/datasets. You can overwrite th
 >>> import datasets
 >>> datasets.set_path('mydir', mkdir=True)
 `datasets module: datasets will be loaded from 'C:\Users\You\mydir'
-
->>> datasets.restore_default_path(True)
 ```
 
 This will write your `datasets` path to `~/.datasets`.
