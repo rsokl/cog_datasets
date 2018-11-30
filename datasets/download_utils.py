@@ -99,8 +99,6 @@ def _download_cifar100(path, tmp_dir):
         print("File already exists:\n\t{}".format(path))
         return None
 
-    train = np.empty((50000, 3072), dtype=np.uint8)
-
     print("Downloading from: {}".format(server_url))
 
     try:
