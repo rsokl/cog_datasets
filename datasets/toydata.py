@@ -7,7 +7,7 @@ class ToyData(object):
 
         Each 'class' in this dataset is its own 'tendril' in the spiral."""
 
-    def __init__(self, num_classes=3, points_per_class=120, num_revolutions=1., seed_value=None):
+    def __init__(self, num_classes=3, points_per_class=120, num_revolutions=1., tendril_noise=0.2, seed_value=None):
         """ Parameters
             ----------
             num_classes : int, optional (default=3)
@@ -18,6 +18,10 @@ class ToyData(object):
 
             num_revolutions : float, optional (default=1.)
                 The number of full rotations to be completed by each tendril.
+
+            tendril_noise : float, optional (default=0.2)
+                Sets the scale of the noise used to scatter the points associated with each
+                tendril. A value of 0 produces pristine tendrils.
 
             seed_value : Optional[int]
                 Provide a seed-value to control the generation of the dataset."""
@@ -40,7 +44,7 @@ class ToyData(object):
         for j in range(K):
             ix = range(N * j, N * (j + 1))
             r = np.linspace(0.0, 1, N)  # radius
-            t = np.linspace(0, 2 * np.pi * num_revolutions, N) + np.random.randn(N) * 0.2  # theta
+            t = np.linspace(0, 2 * np.pi * num_revolutions, N) + np.random.randn(N) * tendril_noise  # theta
             t += j/K * 2*np.pi  # phase-shift to offset subsequent tendrils
             self._coords[ix] = np.column_stack((r * np.sin(t), r * np.cos(t)))
             self._labels[ix] = j
