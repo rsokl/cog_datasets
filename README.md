@@ -6,7 +6,7 @@ Convenience package so that you can keep your data sets in one place, but load t
 Clone Datasets, navigate to the resulting directory, and run
 
 ```shell
-python setup.py install
+pip install .
 ```
 
 ## Usage
