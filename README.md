@@ -19,7 +19,7 @@ from datasets import download_cifar10, download_fashion_mnist, download_mnist
 from datasets import load_mnist, load_fashion_mnist, load_cifar10, ToyData
 ```
 
-By default, all data sets will be downloaded to ~/datasets. You can overwrite this via
+By default, all data sets will be downloaded to `~/datasets`. You can overwrite this via
 
 ```python
 >>> import datasets
