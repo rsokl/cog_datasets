@@ -1,0 +1,2 @@
+include versioneer.py
+include src/cog_datasets/_version.py
