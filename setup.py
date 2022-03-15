@@ -8,7 +8,7 @@ AUTHOR_EMAIL = "rsoklaski@gmail.com"
 URL = "https://github.com/rsokl/cog_datasets"
 
 INSTALL_REQUIRES = [
-    "numpy >= 1.19"
+    "numpy >= 1.19", "matplotlib >= 3.0.0"
 ]
 
 DESCRIPTION = "Save machine learning data sets to a common location."
