@@ -229,16 +229,17 @@ def download_mnist():
         )
         return None
 
-    server_url = "http://yann.lecun.com/exdb/mnist/"
+    server_url = "https://ossci-datasets.s3.amazonaws.com/mnist/"
 
-    check_file_sizes = {
-        "train-images-idx3-ubyte.gz": 9912422,
-        "train-labels-idx1-ubyte.gz": 28881,
-        "t10k-images-idx3-ubyte.gz": 28881,
-        "t10k-labels-idx1-ubyte.gz": 4542,
+    md5_hashes = {
+            "train-images-idx3-ubyte.gz": "f68b3c2dcbeaaa9fbdd348bbdeb94873",
+            "train-labels-idx1-ubyte.gz": "d53e105ee54ea40749a09fcbcd1e9432",
+            "t10k-images-idx3-ubyte.gz": "9fb629c4189551a2d022fa330f9573f3",
+            "t10k-labels-idx1-ubyte.gz": "ec29112dd5afa0611ce80d1b7f02629c",
     }
+
     _download_mnist(
-        path, server_url=server_url, tmp_file=tmp_file, check_sums=check_file_sizes
+        path, server_url=server_url, tmp_file=tmp_file, check_sums=md5_hashes
     )
 
 

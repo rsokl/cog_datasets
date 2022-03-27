@@ -228,7 +228,7 @@ def _download_cifar10(path, tmp_dir):
     return
 
 
-def _download_mnist(path, server_url, tmp_file, check_sums=None):
+def _download_mnist(path, server_url, tmp_file, check_sums):
     import gzip
     import os
     import urllib
@@ -250,22 +250,13 @@ def _download_mnist(path, server_url, tmp_file, check_sums=None):
                 with open(tmp_file, "wb") as handle:
                     handle.write(response.read())
 
-                if check_sums is not None and isinstance(
-                    check_sums[urls[img_key]], str
-                ):
-                    # check md5
-                    expected = check_sums[urls[img_key]]
-                    found = _md5_check(tmp_file)
-                    msg = "md5 checksum did not match!.. deleting file:\nexpected: {}\nfound: {}".format(
-                        expected, found
-                    )
-                    assert expected == found, msg
-                elif check_sums is not None and isinstance(
-                    check_sums[urls[img_key]], int
-                ):
-                    os.path.getsize(tmp_file) == check_sums[
-                        urls[img_key]
-                    ], "downloaded filesize is bad!.. deleting file"
+                # check md5
+                expected = check_sums[urls[img_key]]
+                found = _md5_check(tmp_file)
+                msg = "md5 checksum did not match!.. deleting file:\nexpected: {}\nfound: {}".format(
+                    expected, found
+                )
+                assert expected == found, msg
 
                 with gzip.open(tmp_file, "rb") as uncompressed:
                     tmp = np.frombuffer(uncompressed.read(), dtype=np.uint8, offset=16)
@@ -279,23 +270,13 @@ def _download_mnist(path, server_url, tmp_file, check_sums=None):
                 with open(tmp_file, "wb") as handle:
                     handle.write(response.read())
 
-                if check_sums is not None and isinstance(
-                    check_sums[urls[img_key]], str
-                ):
-                    # check md5
-                    expected = check_sums[urls[lbl_key]]
-                    found = _md5_check(tmp_file)
-                    msg = "md5 checksum did not match!.. deleting file:\nexpected: {}\nfound: {}".format(
-                        expected, found
-                    )
-                    assert expected == found, msg
-                elif check_sums is not None and isinstance(
-                    check_sums[urls[img_key]], int
-                ):
-                    # check filesize
-                    os.path.getsize(tmp_file) == check_sums[
-                        urls[img_key]
-                    ], "downloaded filesize is bad!.. deleting file"
+                # check md5
+                expected = check_sums[urls[lbl_key]]
+                found = _md5_check(tmp_file)
+                msg = "md5 checksum did not match!.. deleting file:\nexpected: {}\nfound: {}".format(
+                    expected, found
+                )
+                assert expected == found, msg
 
                 with gzip.open(tmp_file, "rb") as uncompressed:
                     tmp_lbls = np.frombuffer(
